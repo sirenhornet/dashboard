@@ -1,0 +1,27 @@
+name: deploy
+
+on:
+  schedule:
+    - cron: '31 1 * * *'
+    - cron: '32 7 * * *'
+    - cron: '33 13 * * *'
+    - cron: '34 19 * * *'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1800
+    steps:
+      - name: checkout
+        uses: actions/checkout@v7
+      - name: deploy
+        env:
+          CNAME: ${{ secrets.CNAME }}
+          DEPLOY_COMMAND: ${{ secrets.DEPLOY_COMMAND }}
+        run: |
+          bash ./deploy.sh
+      - name: ntfy
+        run: |
+          echo "Dashboard deploy"
+          curl -sd "Dashboard deploy" https://ntfy.sh/sirenhornet/dashboard
