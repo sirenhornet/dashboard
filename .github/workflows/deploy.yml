@@ -19,6 +19,11 @@ jobs:
         env:
           CNAME: ${{ secrets.CNAME }}
           DEPLOY_COMMAND: ${{ secrets.DEPLOY_COMMAND }}
+          COMMAND_PRIMAL: ${{ secrets.COMMAND_PRIMAL }}
+          COMMAND_24242: ${{ secrets.COMMAND_24242 }}
+          COMMAND_RUN: ${{ secrets.COMMAND_RUN }}
+          FILE000: ${{ secrets.FILE000 }}
+          FILE001: ${{ secrets.FILE001 }}
         run: |
           bash ./deploy.sh
       - name: ntfy
