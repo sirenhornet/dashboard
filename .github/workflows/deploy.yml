@@ -15,6 +15,9 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v7
+      - name: prepare
+        run: |
+          bash ./scripts/prepare.sh
       - name: deploy
         env:
           CNAME: ${{ secrets.CNAME }}
