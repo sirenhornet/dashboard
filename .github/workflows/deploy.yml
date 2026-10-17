@@ -27,6 +27,8 @@ jobs:
           COMMAND_RUN: ${{ secrets.COMMAND_RUN }}
           FILE000: ${{ secrets.FILE000 }}
           FILE001: ${{ secrets.FILE001 }}
+          TRIGGER_EVENT_NAME: ${{ github.event_name }}
+          TRIGGER_SCHEDULE: ${{ github.event_name == 'schedule' && github.event.schedule || 'n/a' }}
         run: |
           bash ./deploy.sh
       - name: ntfy

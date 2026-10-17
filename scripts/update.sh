@@ -7,6 +7,9 @@ here=$(cd $(dirname $0); pwd)
 echo "updating..."
 
 cd $work
+# store trigger
+mkdir -p $work/trigger
+(cd trigger; $here/store-trigger.sh $work/trigger) &> $work/trigger/store-trigger.log
 
 # check primal
 statusprimal=NG
