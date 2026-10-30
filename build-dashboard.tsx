@@ -16,12 +16,21 @@ const StatusItem = ({ item }: { item: StatusItem }) => (
   <li>{item.name}: {item.status}</li>
 )
 
+const formatElapsed = (timestamp: number) => {
+  const elapsedMs = Math.max(0, Date.now() - timestamp * 1000)
+  const totalMinutes = Math.floor(elapsedMs / 60000)
+  const hours = Math.floor(totalMinutes / 60)
+  const minutes = totalMinutes % 60
+  return `${hours}h ${minutes}m`
+}
+
 const StatusBlock = ({ data }: { data: JsonData }) => {
   const isoStr = new Date(data.timestamp * 1000).toISOString()
   return (
     <section>
       <h2>{data.title}</h2>
-      <time dateTime={isoStr}>{isoStr}</time>
+      <time dateTime={isoStr}>{isoStr}</time>{" "}
+      <span className="elapsed" data-timestamp={data.timestamp}>({formatElapsed(data.timestamp)} ago)</span>
       <ul>
         {data.status.map((item, i) => (
           <StatusItem key={i} item={item} />
@@ -31,19 +40,41 @@ const StatusBlock = ({ data }: { data: JsonData }) => {
   )
 }
 
-const StatusApp = ({ items }: { items: JsonData[] }) => (
-  <html lang="en">
-    <head>
-      <meta charSet="UTF-8" />
-      <title>Status</title>
-    </head>
-    <body>
-      {items.map((data, index) => (
-        <StatusBlock key={index} data={data} />
-      ))}
-    </body>
-  </html>
-)
+const clientScript = `(() => {
+  const now = new Date()
+  const iso = now.toISOString()
+  const displayed = document.getElementById("displayed-at")
+  if (displayed) {
+    displayed.textContent = iso
+    displayed.setAttribute("datetime", iso)
+  }
+  document.querySelectorAll(".elapsed").forEach((el) => {
+    const timestamp = Number(el.getAttribute("data-timestamp")) * 1000
+    const minutes = Math.floor(Math.max(0, now.getTime() - timestamp) / 60000)
+    el.textContent = \`(\${Math.floor(minutes / 60)}h \${minutes % 60}m ago)\`
+  })
+})()`
+
+const StatusApp = ({ items }: { items: JsonData[] }) => {
+  const nowIso = new Date().toISOString()
+  return (
+    <html lang="en">
+      <head>
+        <meta charSet="UTF-8" />
+        <title>Status</title>
+      </head>
+      <body>
+        <p>
+          Displayed at: <time id="displayed-at" dateTime={nowIso}>{nowIso}</time>
+        </p>
+        {items.map((data, index) => (
+          <StatusBlock key={index} data={data} />
+        ))}
+        <script dangerouslySetInnerHTML={{ __html: clientScript }} />
+      </body>
+    </html>
+  )
+}
 
 const formatHtml = (html: string) => {
   const tokens = html.match(/(<\/?[^>]+>|[^<]+)/g) || []
